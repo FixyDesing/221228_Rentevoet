@@ -6,11 +6,20 @@ output: html_document
 ---
 
 ```{r}
+
+install.packages('forecast', dependencies = TRUE)
+library(forecast)
+library(zoo)
+
 # Lees de csv-bestand in R
-data <- read.csv("./DATA/rente.csv", header = TRUE)
+data <- read.csv("../DATA/rente.csv", header = TRUE)
+
+data$datum_formatted <- as.Date(data$Datum, "%d/%m/%Y")
+
+data$rentevoet <- gsub("%", "", data$rentevoet)
 
 # Converteer de datakolom naar een tijdreeks
-ts <- ts(data$rente, frequency = 365)
+ts <- ts(data$rentevoet, frequency = 365)
 
 # Maak een diagram van de tijdreeks
 plot(ts)
@@ -20,6 +29,34 @@ model <- auto.arima(ts)
 
 # Maak voorspellingen voor de komende maanden
 predictions <- forecast(model, h =
+
+```
+
+```{r}
+# Lees de csv-bestanden in R
+rente_data <- read.csv("../DATA/rente.csv", header = TRUE)
+inflatie_data <- read.csv("../DATA/inflatie.csv", header = TRUE)
+
+
+rente_data$datum_formatted <- as.Date(rente_data$Datum, "%d/%m/%Y")
+
+rente_data$rentevoet <- gsub("%", "", rente_data$rentevoet)
+
+
+# Converteer de datakolommen naar tijdreeksen
+rente_ts <- ts(rente_data$rentevoet, frequency = 365)
+inflatie_ts <- ts(inflatie_data$Jaargemiddelde, frequency = 365)
+
+# Maak een lijngrafiek van de tijdreeksen om de relatie te visualiseren
+plot(rente_ts, type = "l", col = "blue", ylab = "Rente")
+lines(inflatie_ts, col = "red", ylab = "Inflatie")
+
+# Voer een lineaire regressie uit om de rentevoet te voorspellen op basis van de inflatie
+model <- lm(rente_ts ~ inflatie_ts)
+model <- model.frame.default(formula = rente_ts ~ inflatie_ts, drop.unused.levels = TRUE)
+
+# Maak voorspellingen voor de komende maanden
+predictions <- predict(model, n.ahead = 12)
 
 ```
 
