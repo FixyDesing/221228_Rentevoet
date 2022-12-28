@@ -1,0 +1,25 @@
+---
+title: "221228_Rentevoet"
+author: "Robbe Van Molle"
+date: "2022-12-28"
+output: html_document
+---
+
+```{r}
+# Lees de csv-bestand in R
+data <- read.csv("./DATA/rente.csv", header = TRUE)
+
+# Converteer de datakolom naar een tijdreeks
+ts <- ts(data$rente, frequency = 365)
+
+# Maak een diagram van de tijdreeks
+plot(ts)
+
+# Maak een ARIMA-model voor de tijdreeks
+model <- auto.arima(ts)
+
+# Maak voorspellingen voor de komende maanden
+predictions <- forecast(model, h =
+
+```
+
